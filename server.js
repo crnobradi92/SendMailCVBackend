@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
 const nodemailer = require('nodemailer');
 
 const app = express();
@@ -9,30 +8,11 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/send-email', async (req, res) => {
-  const { name, email, subject, message, 'g-recaptcha-response': recaptchaToken } = req.body;
+  const { name, email, subject, message } = req.body;
 
   // Provera da li su sva polja popunjena
   if (!name || !email || !subject || !message) {
     return res.status(400).json({ status: "error", message: 'Sva polja su obavezna.' });
-  }
-
-  // Provera da li postoji reCAPTCHA token
-  if (!recaptchaToken) {
-    return res.status(400).json({ status: "error", message: "reCAPTCHA verifikacija nije potvrđena." });
-  }
-
-  // Verifikacija reCAPTCHA tokena sa Google serverom
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`;
-  try {
-    const recaptchaRes = await axios.post(verifyUrl);
-    const data = recaptchaRes.data;
-
-    if (!data.success) {
-      return res.status(400).json({ status: "error", message: "reCAPTCHA verifikacija nije prošla." });
-    }
-  } catch (err) {
-    console.error("Greška u reCAPTCHA:", err.message);
-    return res.status(500).json({ status: "error", message: "Greška pri verifikaciji reCAPTCHA." });
   }
 
   // Konfigurisanje Gmail SMTP transportera
