@@ -7,6 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 🟢 Health check ruta za Better Uptime pingovanje
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
 
